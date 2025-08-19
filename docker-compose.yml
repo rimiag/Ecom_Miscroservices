@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # User Service
+  user-service:
+    image: rimaaig/user-service:latest
+    container_name: user_service_container
+    ports:
+      - "8000:8000" # Maps host port 8081 to container port 8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://user_db:5432/userdb
+      - DB_USERNAME=admin
+      - DB_PASSWORD=password
+    depends_on:
+      - user_db
+    networks:
+      - app-network
+
+  # Product Service
+  product-service:
+    image: rimaaig/product-service:latest
+    container_name: product_service_container
+    ports:
+      - "8001:8001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://product_db:5432/productdb
+    depends_on:
+      - product_db
+    networks:
+      - app-network
+
+  # Order Service
+  order-service:
+    image: rimaaig/order-service:latest
+    container_name: order_service_container
+    ports:
+      - "8002:8002"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://order_db:5432/orderdb
+    depends_on:
+      - order_db
+    networks:
+      - app-network
+
+  # Payment Service
+  payment-service:
+    image: rimaaig/payment-service:latest
+    container_name: payment_service_container
+    ports:
+      - "8003:8003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://payment_db:5432/paymentdb
+    depends_on:
+      - payment_db
+    networks:
+      - app-network
+
+  # Databases for each service (Example using PostgreSQL)
+  user_db:
+    image: postgres:13
+    container_name: user_db_container
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  product_db:
+    image: postgres:13
+    container_name: product_db_container
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  order_db:
+    image: postgres:13
+    container_name: order_db_container
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  payment_db:
+    image: postgres:13
+    container_name: payment_db_container
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+# Define a custom network for all services to communicate
+networks:
+  app-network:
+    driver: bridge
+
+# Define volumes to persist database data
+volumes:
+  user_db_data:
+  product_db_data:
+  order_db_data:
+  payment_db_data:
